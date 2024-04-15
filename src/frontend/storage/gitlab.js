@@ -325,6 +325,7 @@ export default {
 				.then((response) => {
 					context.commit('setAccessToken', response.data.access_token);
 					context.commit('setRefreshToken', response.data.refresh_token);
+					// Если expires_in нет, считаем, что токен вечный
 					response.data.expires_in && setTimeout(() => context.dispatch('refreshAccessToken'), (response.data.expires_in - 10) * 1000);
 					if (OAuthCode) context.dispatch('reloadAll');
 				}).catch((e) => {
