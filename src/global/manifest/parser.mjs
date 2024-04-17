@@ -145,12 +145,19 @@ const parser = {
 			}
 		}
 	},
+
+	debug(func, action, marker, ...params){
+		if( false ){
+			console.debug(`${func} - ${action}`, marker, ...structuredClone(params) );
+		}
+	},
 	// Склеивание манифестов
 	// destination - Объект с которым происходит объединение. Низкий приоритете.
 	// source - Объект с которым происходит объединение. Высокий приоритете.
 	// location - Размещение объекта source (источник изменений)
 	// path - Путь к объекту
 	merge(destination, source, location, path) {
+		this.debug('merge', 'start', location, destination, source, path, typeof source);
 		let result;
 		if (destination === undefined) {
 			result = source;
@@ -175,23 +182,34 @@ const parser = {
 			this.pushToMergeMap(path, result, location);
 		} else if (typeof source === 'object') {
 			result = destination;
+			if (Object.isSealed(result)) {
+				console.warn('merge - found sealed object', location, result, Object.isExtensible(result), Object.isFrozen(result));
+				result = structuredClone(result);
+			}
 			typeof result !== 'object' && (result = {});
 			const pathStruct = path ? path.split('/') : [];
 			const entity = pathStruct.pop();
 			for (const id in source) {
 				const keyPath = `${path || ''}/${id}`;
+				this.debug('merge', 'object source', location, id, source[id], result[id], typeof id );
 				if (result[id]) {
+					this.debug('merge', 'object - source if - true', location, id );
 					result[id] = this.merge(result[id], source[id], location, `${path || ''}/${id}`);
 				} else {
-					result[id] = source[id];
+					let src = source[id];
+					this.debug('merge', 'object - source if - false', location, id, result[id], Object.getOwnPropertyDescriptor(result, id), Object.isSealed(result), src );
+					result[id] = src;
+					this.debug('merge', 'object - source if - false - 2', location, id, result[id], src );
 					this.pushToMergeMap(keyPath, result[id], location);
 				}
 				pathStruct.length == 1 && this.propResolver[entity] && this.propResolver[entity](result[id], location);
 			}
 		} else {
+			this.debug('merge', 'not obj or []', location, source );
 			result = source;
 			this.pushToMergeMap(path, result, location);
 		}
+		this.debug('merge', 'result', location, path, result);
 		return result;
 	},
 
@@ -258,6 +276,7 @@ const parser = {
 
 	async parseManifest(manifest, uri) {
 		this.pushToMergeMap('/', null, uri);
+		// this.manifest = structuredClone(this.merge(this.manifest, manifest, uri));
 		this.manifest = this.merge(this.manifest, manifest, uri);
 
 		for (const section in manifest) {
@@ -363,6 +382,7 @@ const parser = {
 		const awaited = Object.entries(this?.awaitedPackages);
 		if (awaited.length) {
 			awaited.forEach(([uri, pkg]) => {
+				console.log('parser.mjs - checkLoaded- forEach', uri, pkg, Object.entries(pkg.$package), this.packages);
 				const [id, $pkg] = Object.entries(pkg.$package)[0];
 				const unresolved = Object.entries($pkg.dependencies).filter(([id, _]) =>
 					!this.packages[id]
@@ -383,6 +403,8 @@ const parser = {
 			const manifest = response && (typeof response.data === 'object'
 				? response.data
 				: JSON.parse(response.data));
+			
+			this.debug('import', 'start', uri, manifest);
 
 			// если манифест - пакет
 			if (manifest?.$package) {

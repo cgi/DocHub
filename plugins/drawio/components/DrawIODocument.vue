@@ -135,7 +135,6 @@
             })
             // Если что-то пошло не так, генерируем HTML с ошибкой
             .catch((error) => {
-              debugger;
               this.content_error = `<div style="color:#fff; background-color: #f00">Ошибка выполнения запроса: <br> ${error} <br> ${error.stack}</div>`;
             });
         } else {
@@ -177,12 +176,12 @@
                 try {
                   handlers[key](plugin, node, el.operation[key], el.params);
                 } catch ( error ) {
-                  plugin.log("handler error for handler", key, error, error.stack);
+                  plugin.log('handler error for handler', key, error, error.stack);
                 }
               }
               plugin.log('xpath result item', node);
             } catch ( error ) {
-              plugin.log("xpath_result error", i, error, error.stack);
+              plugin.log('xpath_result error', i, error, error.stack);
             }
           }
         });
