@@ -51,16 +51,15 @@
       toPrint: {
         type: Boolean,
         default: false
-      },
-      serverURI: {
-        type: String,
-        default: 'http://localhost:9080/?embed=1&ui=atlas&spin=1&modified=unsavedChanges&saveAndExit=0&noSaveBtn=1&noExitBtn=1&proto=json'
       }
     },
     setup() {
       const frame = ref(null);
+      const uri = process.env.VUE_APP_DOCHUB_PLUGIN_DRAWIO_SERVER_URI;
+      const serverURI = uri ? uri: 'https://embed.diagrams.net/?embed=1&ui=atlas&spin=1&modified=unsavedChanges&saveAndExit=0&noSaveBtn=1&noExitBtn=1&proto=json';
       return {
-        frame
+        frame,
+        serverURI
       };
     },
     data() {
@@ -100,10 +99,17 @@
 
       window.addEventListener('message', this.listenEvents);
     },
+    unmounted(){
+      window.removeEventListener('message', this.listenEvents);
+    },
     methods: {
       log(...args){
+        // В условии можно поставить интересующие случаи для точечной отладки
         // eslint-disable-next-line
-        console.info( ...args );
+        if (false){
+          // eslint-disable-next-line
+          console.info( ...args );
+        }
       },
       // Функция обновления контента документа с учетом параметров содержащихся в "this.profile"
       doRefresh() {
@@ -197,6 +203,12 @@
           style : this.change_style
         };
         this.log('get_mutation_handlers - default_handlers - 1', default_handlers);
+        
+        const LOAD_HANDLERS = process.env.VUE_APP_DOCHUB_PLUGIN_DRAWIO_LOAD_CUSTOM_HANDLERS;
+        if( !LOAD_HANDLERS || LOAD_HANDLERS.toLowerCase() != 'true' ) {
+          return default_handlers;
+        }
+
         // Можно переопределить стандартные реализации
         for (let key of Object.keys(this.conf)) {
           default_handlers[key] = this.compile_function(this.conf[key]);
@@ -256,7 +268,7 @@
 
       listenEvents(evt) {
 
-        if (evt.data.length > 0 && evt.source == this.frame.contentWindow) {
+        if (evt.data.length > 0 && this.frame && evt.source == this.frame.contentWindow) {
           var msg = JSON.parse(evt.data);
           this.log('listenEvents - msg', msg);
 

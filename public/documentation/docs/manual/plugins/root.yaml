@@ -20,6 +20,7 @@ docs:
         type: test
     source: examples/example.html
 
+
   dochub.plugins.svg_file:
     title: Пример использования SVG
     type: svg
@@ -53,6 +54,12 @@ docs:
     type: markdown
     source: svg_inline.md
     location: DocHub/Руководство/Плагины/Примеры/SVG
+
+  dochub.plugins.drawio:
+    location: DocHub/Руководство/Плагины/Примеры/Drawio
+    type: markdown
+    source: drawio_intro.md
+
 
   dochub.plugins.devtool_new:
     location: DocHub/Руководство/Плагины/Примеры/DevTool
