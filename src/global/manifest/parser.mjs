@@ -184,7 +184,7 @@ const parser = {
 			result = destination;
 			if (Object.isSealed(result)) {
 				console.warn('merge - found sealed object', location, result, Object.isExtensible(result), Object.isFrozen(result));
-				result = structuredClone(result);
+				result = Object.assign({}, result);
 			}
 			typeof result !== 'object' && (result = {});
 			const pathStruct = path ? path.split('/') : [];
@@ -382,7 +382,6 @@ const parser = {
 		const awaited = Object.entries(this?.awaitedPackages);
 		if (awaited.length) {
 			awaited.forEach(([uri, pkg]) => {
-				console.log('parser.mjs - checkLoaded- forEach', uri, pkg, Object.entries(pkg.$package), this.packages);
 				const [id, $pkg] = Object.entries(pkg.$package)[0];
 				const unresolved = Object.entries($pkg.dependencies).filter(([id, _]) =>
 					!this.packages[id]
