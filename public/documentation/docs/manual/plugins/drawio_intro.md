@@ -292,3 +292,99 @@ entities:
 Если вы раширите список обработчиков чем-нидудь, что вы считаете 
 будет полезным и другим пользователям - обращайтесь - мы 
 готовы расширить перечень встроенных обработчиков
+
+# Пример использования плагина
+
+В примере ниже используется набор обработчиков на основе xpath 
+## Шаблон как есть без каких-либо изменений:
+
+```yaml
+  dochub.plugins.drawio.as_is:
+    location: DocHub/Руководство/Плагины/Примеры/Drawio/Файл как есть
+    type: drawio
+    template: templates/example.drawio
+```
+
+![](@document/dochub.plugins.drawio.as_is)
+
+## Применение к шаблону данных из запроса
+
+```yaml
+  dochub.plugins.drawio.parametrized:
+    location: DocHub/Руководство/Плагины/Примеры/Drawio/Применили пост. обработку
+    type: drawio
+    template: templates/example.drawio
+    source: >
+      (
+        {
+        "xml_mutators" : [
+            { "id": 1, "xpath": "//*[@id = 'test.sys1.c1']",
+                "params": { "style_self" : false},
+                "operation": {
+                    "attrs": {
+                        "c4Description": "Описание контейнера 1",
+                        "c4Name": "Имя контейнера 1",
+                        "c4Technology" : "Java, Spring"
+                    },
+                    "style": {
+                        "fillColor": "red"
+                    }
+                }
+            },
+            { "id": 2, "xpath": "//*[@id = 'test.sys1.c2']",
+                "params": { "style_self" : false},
+                "operation": {
+                    "attrs": {
+                        "c4Description": "Описание контейнера 2",
+                        "c4Name": "Имя контейнера 2",
+                        "c4Technology" : "Java17, Spring"
+                    },
+                    "style": {
+                        "fillColor": "green"
+                    }
+                }
+            },
+            { "id": 3, "xpath": "//*[@id = 'test.sys1.c3']",
+                "params": { "style_self" : false},
+                "operation": {
+                    "attrs": {
+                        "c4Description": "Описание контейнера 3",
+                        "c4Name": "Имя контейнера 3",
+                        "c4Technology" : "Java8, Springboot"
+                    },
+                    "style": {
+                        "fillColor": "blue"
+                    }
+                }
+            },
+            { "id": 4, "xpath": "//*[@id = 'test.sys1']",
+                "params": { "style_self" : false},
+                "operation": {
+                    "attrs": {
+                        "c4Application": "Приложение 1",
+                        "c4Name": "Имя ИС 1"
+                    },
+                    "style": {
+                        "fillColor": "grey"
+                    }
+                }
+            },        
+            { "id": 5, "xpath": "//*[@id = 'test.sys1.conn1']",
+                "params": { "style_self" : false},
+                "operation": {
+                    "attrs": {
+                        "c4Description": "Описание связи между компонентами",
+                        "c4Technology": "Технология HTTP",
+                        "extra_data": "Дополнительная информация отображаемая в tooltip элемента"
+                    },
+                    "style": {
+                        "strokeColor": "orange"
+                    }
+                }
+            }        
+            ]
+        }
+      )
+```
+
+![](@document/dochub.plugins.drawio.parametrized)
