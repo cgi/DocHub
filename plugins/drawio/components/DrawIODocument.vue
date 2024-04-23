@@ -120,7 +120,13 @@
               this.log('get config', conf);
               this.conf = conf;
             })
-            .then( () => this.pullData(this.profile.source))
+            .then( () => { 
+              if (this.profile.source) {
+                return this.pullData(this.profile.source) ;
+              } else {
+                return Promise.resolve(null);
+              }
+            } )
             .then( (data) => {
               this.log('get source', data);
               this.data = data;
@@ -131,12 +137,14 @@
               if (this.params.check) {
                 this.showData = false;
                 this.checkTemplate(response.data, this.data.params);
-              } else {
+              } else if ( this.data  ){
                 this.showData = true;
                 this.content_tmp = this.render_params(response.data, this.data.params);
                 this.log('render_params', response.data, this.data.params);
                 this.content     = this.render_xml_mutators(this.content_tmp, this.data.xml_mutators);
                 this.log('render_xml_mutators', this.content_tmp, this.data.xml_mutators);
+              } else {
+                this.content = response.data;
               }
             })
             // Если что-то пошло не так, генерируем HTML с ошибкой
@@ -356,4 +364,6 @@ td {
   border: solid 1px #ccc;
   width: 98%;
   height: 96%;
+  min-height: 800px;
+  min-width: 800px;
 }</style>
