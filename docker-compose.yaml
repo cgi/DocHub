@@ -9,12 +9,18 @@ services:
       dockerfile: Dockerfile
       target: nginx
     # Setup variables however you want
-    # environment:
-    #   VUE_APP_PLANTUML_SERVER: localhost:8079/svg/
+    environment:
+      VUE_APP_PLANTUML_SERVER: http://localhost:8080/svg/
+      VUE_APP_PLANTUML_REQUEST_TYPE: POST
+      VUE_APP_DOCHUB_GITLAB_URL: https://git.gosuslugi.local
+      VUE_APP_DOCHUB_PERSONAL_TOKEN: glpat-E29vMj1-_HfyWe3yoLB7
+      VUE_APP_DOCHUB_ROOT_MANIFEST: gitlab:2827:esia-ng@dochub.yaml
     env_file:
       - .env
     ports:
       - "8080:8080"
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   plantuml:
     image: seaf/plantuml-server:jetty

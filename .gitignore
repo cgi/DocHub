@@ -9,6 +9,8 @@ node_modules
 /src/hidden
 /cache
 /public/temp
+# другой проект
+/public/esia-dochub
 
 ./plugins.json
 
